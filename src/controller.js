@@ -1,14 +1,19 @@
 import express from 'express';
 import fs from 'fs';
 import bodyParser from 'body-parser';
-import { fileUploader, uploadErrorHandler } from './upload.js';
-import { replaceKeys } from './keysReplacer.js';
-import { generatePDF } from './export.js';
+import { fileUploader, uploadErrorHandler } from './services/upload.js';
+import { replaceKeys } from './services/keysReplacer.js';
+import { generatePDF } from './services/export.js';
 
 const app = express();
 const multipartKey = 'certificate';
 
 app.use(bodyParser.json());
+
+app.get('/ping', (_req, res) => {
+	res.status(200).send("I'm alive!");
+});
+
 app.post('/templates', fileUploader.single(`${multipartKey}`), (req, res) => {
 	const file = req.file;
 
@@ -48,10 +53,6 @@ app.use((err, _req, res, next) => {
 	res.status(500).json(err.message);
 
 	next(err)
-});
-
-app.get('/ping', (_req, res) => {
-	res.status(200).send("I'm alive!");
 });
 
 export default app;
