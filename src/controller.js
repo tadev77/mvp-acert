@@ -3,11 +3,12 @@ import fs from 'fs';
 import bodyParser from 'body-parser';
 import { fileUploader, uploadErrorHandler } from './upload.js';
 import { replaceKeys } from './keysReplacer.js';
+import { generatePDF } from './export.js';
 
 const app = express();
 const multipartKey = 'certificate';
 
-app.use(bodyParser.json()) // for parsing application/json
+app.use(bodyParser.json());
 app.post('/templates', fileUploader.single(`${multipartKey}`), (req, res) => {
 	const file = req.file;
 
@@ -23,17 +24,22 @@ app.post('/templates', fileUploader.single(`${multipartKey}`), (req, res) => {
 
 app.post('/certificates/:templateId', (req, res) => {
 	const { templateId } = req.params;
-	const newKey = new Date();
 
 	fs.readFile(`/tmp/uploads/${templateId}.svg`, (err, file) => {
 		if(err) {
 			return res.status(500).json({ message: 'File not found!' });
 		}
-		const certificateData = replaceKeys(file, req.body);
-		const certificatePath = `/tmp/certificates/${newKey}.svg`;
-		fs.writeFileSync(certificatePath, certificateData, 'utf-8');
 
-		res.status(200).sendFile(certificatePath);
+		const certificateData = replaceKeys(file, req.body);
+		generatePDF(certificateData).then(certificatePath => {
+			return res.status(200).sendFile(certificatePath);
+		}).catch(reason => {
+			if (reason.cause) {
+				res.status(500).json({ message: reason.cause });
+			} else {
+				res.status(500).json({ message: reason });
+			}
+		})
 	});
 });
 

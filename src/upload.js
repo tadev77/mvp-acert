@@ -1,5 +1,6 @@
 import multer from 'multer';
 import mimeTypes from 'mime-types';
+import crypto from 'node:crypto';
 
 let createdTemplateId;
 
@@ -8,7 +9,7 @@ const storage = multer.diskStorage({
     cb(null, '/tmp/uploads/');
   },
   filename: (req, _file, cb) => {
-    createdTemplateId = Date.now();
+    createdTemplateId = crypto.randomUUID();
     req.templateId = createdTemplateId;
     cb(null, `${createdTemplateId}.svg`); 
   }
