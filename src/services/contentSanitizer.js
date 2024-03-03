@@ -24,4 +24,4 @@ const sanitizeData = (...sanitizers) => (svg) => {
   return $.html();
 }
 
-export default sanitizeData(enforceCenteredText)
+export default sanitizeData(enforceCenteredText);

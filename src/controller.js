@@ -1,9 +1,9 @@
 import express from 'express';
 import fs from 'fs';
 import bodyParser from 'body-parser';
-import { fileUploader, uploadErrorHandler } from './services/upload.js';
+import { fileUploader, uploadErrorHandler } from './services/uploadService.js';
 import { replaceKeys } from './services/svgReader.js';
-import { generatePDF } from './services/export.js';
+import { generatePDF } from './services/exportService.js';
 
 const app = express();
 const multipartKey = 'certificate';
@@ -29,13 +29,13 @@ app.post('/templates', fileUploader.single(`${multipartKey}`), (req, res) => {
 
 app.post('/certificates/:templateId', (req, res) => {
 	const { templateId } = req.params;
+	let certificateData;
 
 	fs.readFile(`/tmp/uploads/${templateId}.svg`, (err, file) => {
 		if(err) {
 			return res.status(500).json({ message: 'File not found!' });
 		}
 
-		let certificateData;
 		try {
 			certificateData = replaceKeys(file, req.body, templateId);
 		} catch(err) {
