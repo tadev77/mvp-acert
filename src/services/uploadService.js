@@ -1,56 +1,40 @@
-import multer from 'multer';
 import mimeTypes from 'mime-types';
 import fs from 'fs';
+
+import FileStorageRepository from '../repositories/FileStorageRepository.js';
+
 import { extractKeys } from './svgReader.js';
-import sanitizeData from './contentSanitizer.js'
+import sanitizeData from './contentSanitizer.js';
 
-let createdTemplateId;
+const fsr = new FileStorageRepository();
+const uploadErrorHandler = fsr.uploadErrorHandler;
+const templatesPath = '/tmp/uploads'
 
-function postCreationSteps(file) {
-  fs.readFile(file.originalname, (err, fileContent) => {
-    if (err) {
-      throw err;
+const fileUploader = fsr.getFileUploader(
+  (req, file) => {
+    const mimeType = mimeTypes.lookup(file.originalname);
+    if(!mimeType === 'image/svg+xml') {
+      throw new Error('Not a SVG file.');
     }
 
-    const sanitizedContent = sanitizeData(fileContent);
-    global.cpr.storeParameters(extractKeys(fileContent), createdTemplateId);
-    fs.writeFileSync(file.originalname, sanitizedContent);
-  });
-}
+    const templateId = crypto.randomUUID();
+    req.templateId = templateId;
+    return true;
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, '/tmp/uploads/');
   },
-  filename: (req, _file, cb) => {
-    req.templateId = createdTemplateId;
-    cb(null, `${createdTemplateId}.svg`); 
-  }
-});
-
-const fileUploader = multer({ 
-  storage,
-  fileFilter: (_req, file, cb) => {
-    try {
-      const mimeType = mimeTypes.lookup(file.originalname);
-      if (mimeType === 'image/svg+xml') {
-        createdTemplateId = crypto.randomUUID();
-        postCreationSteps(file);
-        cb(null, true);
-      } else {
-        throw new Error('Not a SVG file.');
+  (_req, file, filename) => {
+    fs.readFile(file.originalname, (err, fileContent) => {
+      if (err) {
+        throw err;
       }
-    } catch (error) {
-      cb(error.message);
-    }
+  
+      const sanitizedContent = sanitizeData(fileContent);
+      global.cpr.storeParameters(extractKeys(fileContent), filename);
+  
+      fs.writeFileSync(`${templatesPath}/${filename}.svg`, sanitizedContent);
+    });
   }
-});
-
-function uploadErrorHandler(err, res, expectedName) {
-	if (err instanceof multer.MulterError) {
-		res.status(400).send(`Error Uploading Files: ${err.message}. Please, upload a file on a multipart field named "${expectedName}"`);
-	}
-}
+);
 
 export { 
     fileUploader,
