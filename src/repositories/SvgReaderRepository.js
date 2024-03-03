@@ -36,10 +36,32 @@ export default class CheerioSvgReader {
     this.replaceKeys = this.replaceKeys.bind(this);
   }
 
+  enforceCenteredText($) {
+    $('text[text-align="center"]').each((_, element) => {
+      $(element).children().removeAttr('x').removeAttr('y');
+    });
+  }
+  
+  sanitizeData = (...sanitizers) => (svg) => {
+    const $ = cheerio.load(svg, {
+      xmlMode: true
+    });
+    
+    sanitizers.forEach(sanitizer => {
+      try {
+        sanitizer($);
+      } catch (err) {
+        throw Error(`Got an error in '${sanitizer.name}: ${err}`);
+      }
+    });
+  
+    return $.html();
+  }
+
   replaceKeys (svg, substitutions) {
     const verifiedKeys = [];
     const replacedSvg = loopThroughSvg(svg, (element, $) => {
-      const replacedText = replaceInSentence($(element).text(), substitutions, this.keyRegExp);
+      const replacedText = replaceInSentence($(element).text(), substitutions, this.keyRegExp, verifiedKeys);
       $(element).text(replacedText);
     });
     
