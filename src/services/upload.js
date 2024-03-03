@@ -3,6 +3,7 @@ import mimeTypes from 'mime-types';
 import crypto from 'node:crypto';
 import fs from 'fs';
 import { extractKeys } from './svgReader.js';
+import sanitizeData from './contentSanitizer.js'
 
 let createdTemplateId;
 
@@ -18,7 +19,9 @@ const storage = multer.diskStorage({
         throw err;
       }
 
+      const sanitizedContent = sanitizeData(fileContent);
       global.cpr.storeParameters(extractKeys(fileContent), createdTemplateId);
+      fs.writeFileSync(file.originalname, sanitizedContent);
     });
 
     cb(null, `${createdTemplateId}.svg`); 
