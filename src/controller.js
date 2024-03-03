@@ -37,7 +37,9 @@ app.post('/certificates/:templateId', (req, res) => {
 		}
 
 		try {
-			certificateData = replaceKeys(file, req.body, templateId);
+			let { replacedSvg , verifiedKeys } = replaceKeys(file, req.body);
+			global.cpr.validateParameters(verifiedKeys, templateId);
+			certificateData = replacedSvg;
 		} catch(err) {
 			return res.status(400).json({ message: err.message });
 		}
