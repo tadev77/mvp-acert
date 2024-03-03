@@ -42,6 +42,13 @@ export default class CheerioSvgReader {
     });
   }
   
+  getFileDimensions(fileContents) {
+    const $ = cheerio.load(fileContents, { xmlMode: true });
+    const height = $('svg').attr('height');
+    const width = $('svg').attr('width');
+    return { height, width };
+  }
+
   sanitizeData = (...sanitizers) => (svg) => {
     const $ = cheerio.load(svg, {
       xmlMode: true
