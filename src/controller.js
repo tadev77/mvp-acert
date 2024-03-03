@@ -35,7 +35,12 @@ app.post('/certificates/:templateId', (req, res) => {
 			return res.status(500).json({ message: 'File not found!' });
 		}
 
-		const certificateData = replaceKeys(file, req.body);
+		let certificateData;
+		try {
+			certificateData = replaceKeys(file, req.body, templateId);
+		} catch(err) {
+			return res.status(400).json({ message: err.message });
+		}
 		
 		generatePDF(certificateData).then(certificatePath => {
 			return res.status(200).sendFile(certificatePath);

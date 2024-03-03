@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio';
 
 const regexp = /\[.+\]/g;
+let verifiedKeys;
 
 function replaceInSentence(textInput, substitutions) {
 	const matches = textInput.matchAll(regexp);
@@ -10,6 +11,7 @@ function replaceInSentence(textInput, substitutions) {
 		key = match[0].slice(1,-1);
 
 		if(substitutions[key] !== undefined) {
+			verifiedKeys.push(key);
 			textInput = textInput.replace(match[0], substitutions[key]);
 		}
 	}
@@ -29,11 +31,16 @@ function loopThroughSvg(svg, callback) {
 	return $.html();
 }
 
-const replaceKeys = (svg, substitutions) => {
-	return loopThroughSvg(svg, (element, $) => {
+const replaceKeys = (svg, substitutions, templateId) => {
+	verifiedKeys = [];
+	const replacedSvg = loopThroughSvg(svg, (element, $) => {
 		const replacedText = replaceInSentence($(element).text(), substitutions);
 		$(element).text(replacedText);
 	});
+
+	global.cpr.validateParameters(verifiedKeys, templateId);
+
+	return replacedSvg;
 }
 
 const extractKeys = (svg) => {
