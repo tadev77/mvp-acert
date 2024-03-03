@@ -1,6 +1,8 @@
 import multer from 'multer';
 import mimeTypes from 'mime-types';
 import crypto from 'node:crypto';
+import fs from 'fs';
+import { extractKeys } from './svgReader.js';
 
 let createdTemplateId;
 
@@ -8,9 +10,17 @@ const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, '/tmp/uploads/');
   },
-  filename: (req, _file, cb) => {
+  filename: (req, file, cb) => {
     createdTemplateId = crypto.randomUUID();
     req.templateId = createdTemplateId;
+    fs.readFile(file.originalname, (err, fileContent) => {
+      if (err) {
+        throw err;
+      }
+
+      global.cpr.storeParameters(extractKeys(fileContent), createdTemplateId);
+    });
+
     cb(null, `${createdTemplateId}.svg`); 
   }
 });

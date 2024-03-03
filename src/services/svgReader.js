@@ -17,20 +17,37 @@ function replaceInSentence(textInput, substitutions) {
 	return textInput;
 }
 
-function replaceKeys(svg, substitutions) {
-
+function loopThroughSvg(svg, callback) {
 	const $ = cheerio.load(svg, {
 		xmlMode: true
 	});
 
 	$('text').each((_, element) => {
-		const replacedText = replaceInSentence($(element).text(), substitutions);
-		$(element).text(replacedText);
+		callback(element, $);
 	});
 
 	return $.html();
 }
 
+const replaceKeys = (svg, substitutions) => {
+	return loopThroughSvg(svg, (element, $) => {
+		const replacedText = replaceInSentence($(element).text(), substitutions);
+		$(element).text(replacedText);
+	});
+}
+
+const extractKeys = (svg) => {
+	const keys = [];
+	loopThroughSvg(svg, (element, $) => {
+		const matches = $(element).text().matchAll(regexp);
+		for (const match of matches) {
+			keys.push(match[0].slice(1,-1));
+		}
+	});
+	return keys;
+}
+
 export {
-	replaceKeys
+	replaceKeys,
+	extractKeys
 }

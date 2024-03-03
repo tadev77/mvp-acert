@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import bodyParser from 'body-parser';
 import { fileUploader, uploadErrorHandler } from './services/upload.js';
-import { replaceKeys } from './services/keysReplacer.js';
+import { replaceKeys } from './services/svgReader.js';
 import { generatePDF } from './services/export.js';
 
 const app = express();
