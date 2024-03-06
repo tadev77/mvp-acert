@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 let mongoHost;
 
-// Verifica se está sendo executado dentro de um contêiner Docker
 if (process.env.DOCKER_ENV === '1') {
   mongoHost = 'mongo';
 } else {
@@ -11,11 +10,7 @@ if (process.env.DOCKER_ENV === '1') {
 
 const mongoURI = `mongodb://${mongoHost}:27017/acert`;
 
-mongoose.connect(mongoURI, {
-  // autoReconnect: true,
-  // reconnectTries: 20,
-  // reconnectInterval: 1000, 
-});
+mongoose.connect(mongoURI);
 
 const db = mongoose.connection;
 

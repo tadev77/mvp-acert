@@ -8,8 +8,4 @@ const certificateTemplateSchema = new Schema({
 
 const CertificateTemplate = mongoose.model('CertificateTemplate', certificateTemplateSchema);
 
-const ct = new CertificateTemplate({
-
-})
-
 export default CertificateTemplate;

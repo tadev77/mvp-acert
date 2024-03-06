@@ -15,7 +15,8 @@ async function validateParameters(requestParameters, templateId) {
       throw Error(`Nothing stored at the templateId ${templateId}`);
     }
 
-    requestParameters = requestParameters.sort();
+    requestParameters.sort();
+    storedParameters.sort();
     const isValid = requestParameters.toString() === storedParameters.toString();
     if(!isValid) {
       throw Error(`Parameters don't match! Expected: ${storedParameters.toString()} - Got: ${requestParameters.toString()}`)

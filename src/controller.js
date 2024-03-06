@@ -1,7 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import bodyParser from 'body-parser';
-import { fileUploader, uploadErrorHandler } from './services/uploadService.js';
+import { fileUploader, postUploadSteps, uploadErrorHandler } from './services/uploadService.js';
 import { replaceKeys } from './services/svgReader.js';
 import { generatePDF } from './services/exportService.js';
 import { validateParameters } from './services/parametersService.js'
@@ -15,13 +15,14 @@ app.get('/ping', (_req, res) => {
 	res.status(200).send("I'm alive!");
 });
 
-app.post('/templates', fileUploader.single(`${multipartKey}`), (req, res) => {
+app.post('/templates', fileUploader.single(`${multipartKey}`), async (req, res) => {
 	const file = req.file;
 
 	if (!file) {
 		return res.status(500).send(`Sorry! We failed to store the file.`);
 	}
 
+	await postUploadSteps(req.templateId);
 	res.json({
 		templateId: req.templateId,
 		message: 'File uploaded successfully!'

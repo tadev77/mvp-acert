@@ -6,7 +6,6 @@ import { CertificateParametersRepository } from '../repositories/CertificatePara
 
 import { extractKeys } from './svgReader.js';
 import sanitizeData from './contentSanitizer.js';
-import crypto from 'crypto';
 
 const fsr = new FileStorageRepository();
 const cpr = new CertificateParametersRepository();
@@ -14,32 +13,31 @@ const uploadErrorHandler = fsr.uploadErrorHandler;
 const templatesPath = '/tmp/uploads'
 
 const fileUploader = fsr.getFileUploader(
-  (req, file) => {
+  (file) => {
     const mimeType = mimeTypes.lookup(file.originalname);
     if(!mimeType === 'image/svg+xml') {
       throw new Error('Not a SVG file.');
     }
 
-    const templateId = crypto.randomUUID();
-    req.templateId = templateId;
     return true;
-
-  },
-  (_req, file, filename) => {
-    fs.readFile(file.originalname, (err, fileContent) => {
-      if (err) {
-        throw err;
-      }
-  
-      const sanitizedContent = sanitizeData(fileContent);
-      cpr.storeParameters(extractKeys(fileContent), filename);
-  
-      fs.writeFileSync(`${templatesPath}/${filename}.svg`, sanitizedContent);
-    });
   }
 );
 
+const postUploadSteps = async (templateId, file) => {
+  fs.readFile(`${templatesPath}/${templateId}.svg`, (err, fileContent) => {
+    if (err) {
+      throw err;
+    }
+
+    const sanitizedContent = sanitizeData(fileContent);
+    cpr.storeParameters(extractKeys(fileContent), templateId);
+
+    fs.writeFileSync(`${templatesPath}/${templateId}.svg`, sanitizedContent);
+  });
+}
+
 export { 
     fileUploader,
+    postUploadSteps,
     uploadErrorHandler
 };
