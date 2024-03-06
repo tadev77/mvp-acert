@@ -5,6 +5,7 @@ import FileStorageRepository from '../repositories/FileStorageRepository.js';
 
 import { extractKeys } from './svgReader.js';
 import sanitizeData from './contentSanitizer.js';
+import crypto from 'crypto';
 
 const fsr = new FileStorageRepository();
 const uploadErrorHandler = fsr.uploadErrorHandler;

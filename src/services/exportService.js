@@ -1,5 +1,6 @@
 import PdfExportRepository from '../repositories/PdfExportRepository.js';
 import SvgReader from '../repositories/SvgReaderRepository.js';
+import crypto from 'crypto';
 
 const svgr = new SvgReader();
 const pdfer = new PdfExportRepository();

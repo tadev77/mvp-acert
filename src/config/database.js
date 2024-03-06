@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const mongoURI = 'mongodb://localhost:27017/acert';
 
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongoURI);
 
 const db = mongoose.connection;
 

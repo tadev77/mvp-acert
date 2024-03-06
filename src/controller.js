@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import { fileUploader, uploadErrorHandler } from './services/uploadService.js';
 import { replaceKeys } from './services/svgReader.js';
 import { generatePDF } from './services/exportService.js';
+import('./config/database.js');
 
 const app = express();
 const multipartKey = 'certificate';
