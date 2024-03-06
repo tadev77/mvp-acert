@@ -19,7 +19,7 @@ app.post('/templates', fileUploader.single(`${multipartKey}`), (req, res) => {
 	const file = req.file;
 
 	if (!file) {
-		return res.status(400).send(`No file found.`);
+		return res.status(500).send(`Sorry! We failed to store the file.`);
 	}
 
 	res.json({
@@ -34,7 +34,7 @@ app.post('/certificates/:templateId', (req, res) => {
 
 	fs.readFile(`/tmp/uploads/${templateId}.svg`, async (err, file) => {
 		if(err) {
-			return res.status(500).json({ message: 'File not found!' });
+			return res.status(500).json({ message: 'Template not found!' });
 		}
 
 		try {

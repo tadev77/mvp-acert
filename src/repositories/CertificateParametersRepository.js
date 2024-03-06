@@ -1,5 +1,4 @@
 import CertificateTemplate from "../models/certificateTemplate.js";
-// I'll use db implementation in the future. This obviously only works if app is constantly up
 export class CertificateParametersRepository {
 
   async storeParameters(parameters, templateId) {
