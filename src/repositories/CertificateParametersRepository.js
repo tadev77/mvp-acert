@@ -16,20 +16,10 @@ export class CertificateParametersRepository {
     }
   }
 
-  async validateParameters(parameters, templateId) {
-
+  async getParameters(templateId) {
     try {
       const template = await CertificateTemplate.findById(templateId).exec();
-
-      if(template === undefined) {
-        throw Error(`Nothing stored at the templateId ${templateId}`);
-      }
-
-      parameters = parameters.sort();
-      const isValid = parameters.toString() === template.parameters.toString();
-      if(!isValid) {
-        throw Error(`Parameters don't match! Expected: ${this.parameters[templateId].toString()} - Got: ${parameters.toString()}`)
-      }
+      return template.parameters;
     } catch (error) {
       throw Error('Error saving certificate template:', error);
     }

@@ -2,12 +2,14 @@ import mimeTypes from 'mime-types';
 import fs from 'fs';
 
 import FileStorageRepository from '../repositories/FileStorageRepository.js';
+import { CertificateParametersRepository } from '../repositories/CertificateParametersRepository.js';
 
 import { extractKeys } from './svgReader.js';
 import sanitizeData from './contentSanitizer.js';
 import crypto from 'crypto';
 
 const fsr = new FileStorageRepository();
+const cpr = new CertificateParametersRepository();
 const uploadErrorHandler = fsr.uploadErrorHandler;
 const templatesPath = '/tmp/uploads'
 
@@ -30,7 +32,7 @@ const fileUploader = fsr.getFileUploader(
       }
   
       const sanitizedContent = sanitizeData(fileContent);
-      global.cpr.storeParameters(extractKeys(fileContent), filename);
+      cpr.storeParameters(extractKeys(fileContent), filename);
   
       fs.writeFileSync(`${templatesPath}/${filename}.svg`, sanitizedContent);
     });

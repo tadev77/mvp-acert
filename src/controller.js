@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import { fileUploader, uploadErrorHandler } from './services/uploadService.js';
 import { replaceKeys } from './services/svgReader.js';
 import { generatePDF } from './services/exportService.js';
-import('./config/database.js');
+import { validateParameters } from './services/parametersService.js'
 
 const app = express();
 const multipartKey = 'certificate';
@@ -32,14 +32,14 @@ app.post('/certificates/:templateId', (req, res) => {
 	const { templateId } = req.params;
 	let certificateData;
 
-	fs.readFile(`/tmp/uploads/${templateId}.svg`, (err, file) => {
+	fs.readFile(`/tmp/uploads/${templateId}.svg`, async (err, file) => {
 		if(err) {
 			return res.status(500).json({ message: 'File not found!' });
 		}
 
 		try {
 			let { replacedSvg , verifiedKeys } = replaceKeys(file, req.body);
-			global.cpr.validateParameters(verifiedKeys, templateId);
+			await validateParameters(verifiedKeys, templateId);
 			certificateData = replacedSvg;
 		} catch(err) {
 			return res.status(400).json({ message: err.message });
