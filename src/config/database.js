@@ -10,7 +10,11 @@ if (process.env.DOCKER_ENV === '1') {
 
 const mongoURI = `mongodb://${mongoHost}:27017/acert`;
 
-mongoose.connect(mongoURI);
+mongoose.connect(mongoURI, {
+  // autoReconnect: true,
+  // reconnectTries: 20,
+  // reconnectInterval: 1000, 
+});
 
 const db = mongoose.connection;
 
