@@ -28,7 +28,7 @@ export default class MulterStorage {
 
   uploadErrorHandler(err, res, expectedName) {
     if (err instanceof multer.MulterError) {
-      res.status(400).send(`Error Uploading Files: ${err.message}. Please, upload a file on a multipart field named "${expectedName}"`);
+      res.status(400).json( { message: `Error Uploading Files: ${err.message}. Please, upload a file on a multipart field named "${expectedName}"` });
     }
   }
 }

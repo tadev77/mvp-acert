@@ -23,7 +23,7 @@ const fileUploader = fsr.getFileUploader(
   }
 );
 
-const postUploadSteps = async (templateId, file) => {
+const postUploadSteps = async (templateId) => {
   fs.readFile(`${templatesPath}/${templateId}.svg`, (err, fileContent) => {
     if (err) {
       throw err;
@@ -36,8 +36,21 @@ const postUploadSteps = async (templateId, file) => {
   });
 }
 
+const getFile = (filename) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(`${templatesPath}/${filename}.svg`, 'utf8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 export { 
     fileUploader,
     postUploadSteps,
+    getFile,
     uploadErrorHandler
 };
