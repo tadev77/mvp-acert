@@ -16,7 +16,7 @@ function replaceInSentence(textInput, substitutions, keyRegExp, verifiedKeys) {
 	return textInput;
 }
 
-function loopThroughSvg(svg, callback) {
+function loopThroughText(svg, callback) {
 	const $ = cheerio.load(svg, {
 		xmlMode: true
 	});
@@ -39,6 +39,20 @@ export default class CheerioSvgReader {
   enforceCenteredText($) {
     $('text[text-align="center"]').each((_, element) => {
       $(element).children().removeAttr('x').removeAttr('y');
+    });
+  }
+
+  inheritChildrenStyle($) {
+    $('text').each((_, element) => {
+      const parent = $(element);
+      const children = $(element).children();
+
+      if (children.length > 0) {
+        const parentStyle = parent.attr('style') || '';
+        const childStyle = children.attr('style') || '';
+        const combinedStyle = `${parentStyle};${childStyle}`;
+        parent.attr('style', combinedStyle);
+      }
     });
   }
   
@@ -67,7 +81,7 @@ export default class CheerioSvgReader {
 
   replaceKeys (svg, substitutions) {
     const verifiedKeys = [];
-    const replacedSvg = loopThroughSvg(svg, (element, $) => {
+    const replacedSvg = loopThroughText(svg, (element, $) => {
       const replacedText = replaceInSentence($(element).text(), substitutions, this.keyRegExp, verifiedKeys);
       $(element).text(replacedText);
     });
@@ -77,7 +91,7 @@ export default class CheerioSvgReader {
   
   extractKeys(svg) {
     const keys = [];
-    loopThroughSvg(svg, (element, $) => {
+    loopThroughText(svg, (element, $) => {
       const matches = $(element).text().matchAll(this.keyRegExp);
       for (const match of matches) {
         keys.push(match[0].slice(1,-1));

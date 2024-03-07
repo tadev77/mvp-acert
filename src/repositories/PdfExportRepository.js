@@ -7,7 +7,7 @@ export default class PdfExportRepository {
     const stream = fs.createWriteStream(certificatePath);
     // PDFDocument uses pt instead of px. pt = px * .75
 		const doc = new PDFDocument({ size: [width * .75, height * .75] });
-    
+		doc.registerFont('Loma', '/usr/share/fonts/opentype/tlwg/Loma.otf');
 		doc.pipe(stream);
 		SVGtoPDF(doc, certificateData);
 		doc.end();
