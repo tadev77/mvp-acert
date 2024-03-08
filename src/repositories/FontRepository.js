@@ -1,18 +1,21 @@
 import { exec } from 'child_process';
 import he from 'he';
+import os from 'os';
 
 import APIError from '../utils/APIError.js';
 
+const command = fontName => os.platform === 'win32' ? 
+`for /f "tokens=1 delims=:" %a in ('fc-list ^| findstr /i "${fontName}"') do @echo %a` :
+`fc-list | grep -i ${fontName} | awk -F: '{print $1}'`;
+
+
 export default class FontRepository {
-  getFontPath(inputFontName) {
+  getFonts(inputFontName) {
     return new Promise((resolve, reject) => {
       const decodedName = he.decode(inputFontName);
       const fontName = decodedName.replace(/[^a-zA-Z0-9\-_]/g, '');
-      const fontMap = new Map();
-
-      // if you use windows, screw you
-      exec(`fc-list | grep -i ${fontName} | awk -F: '{print $1}'`, (error, fontPathList, stderr) => {
-  
+      
+      exec(command(fontName), (error, fontPathList, stderr) => {
         if (error) {
           reject(new APIError(`Error: ${error.message}`, 500));
           return;
@@ -29,20 +32,8 @@ export default class FontRepository {
 
         fontPathList = fontPathList.split('\n');
         fontPathList.pop(); // last element is always empty string
-        fontPathList.forEach(fontPath => {
-          const splittedFontPaths = fontPath.split('/');
-          const sysFileName = splittedFontPaths[splittedFontPaths.length - 1];
-          const sysFilePath = splittedFontPaths.join('/');
-          fontMap.set(sysFileName, sysFilePath);
-        });
-        const exactMatch = 
-          fontMap.get(`${inputFontName}.ttf`) ||
-          fontMap.get(`${inputFontName}.otf`) ||
-          fontMap.get(`${inputFontName}-Regular.otf`) ||
-          fontMap.get(`${inputFontName}-Regular.otf`);
-          
-        resolve(exactMatch ?? [...fontMap.values()][0]);
+        resolve(fontPathList);
       });
-    })
+    });
   }
 }

@@ -2,14 +2,13 @@ import mimeTypes from 'mime-types';
 import fs from 'fs';
 
 import FileStorageRepository from '../repositories/FileStorageRepository.js';
-import FontRepository from '../repositories/FontRepository.js';
+import fontService from './fontService.js';
 import { CertificateParametersRepository } from '../repositories/CertificateParametersRepository.js';
 
 import { extractKeys, getFontFamilies } from './svgReader.js';
 import sanitizeData from './contentSanitizer.js';
 
 const fsr = new FileStorageRepository();
-const fr = new FontRepository();
 const cpr = new CertificateParametersRepository();
 const uploadErrorHandler = fsr.uploadErrorHandler;
 const templatesPath = '/tmp/uploads';
@@ -34,7 +33,7 @@ const postUploadSteps = async (templateId) => {
     const sanitizedContent = sanitizeData(fileContent);
     const fontFamilies = getFontFamilies(sanitizedContent);
     const fonts = await Promise.all(fontFamilies.map(async (fontName) => {
-      const fontPath = await fr.getFontPath(fontName);
+      const fontPath = await fontService.getFontPath(fontName);
       return {
         name: fontName,
         path: fontPath
