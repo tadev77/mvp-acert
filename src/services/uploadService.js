@@ -2,15 +2,17 @@ import mimeTypes from 'mime-types';
 import fs from 'fs';
 
 import FileStorageRepository from '../repositories/FileStorageRepository.js';
+import FontRepository from '../repositories/FontRepository.js';
 import { CertificateParametersRepository } from '../repositories/CertificateParametersRepository.js';
 
-import { extractKeys } from './svgReader.js';
+import { extractKeys, getFontFamilies } from './svgReader.js';
 import sanitizeData from './contentSanitizer.js';
 
 const fsr = new FileStorageRepository();
+const fr = new FontRepository();
 const cpr = new CertificateParametersRepository();
 const uploadErrorHandler = fsr.uploadErrorHandler;
-const templatesPath = '/tmp/uploads'
+const templatesPath = '/tmp/uploads';
 
 const fileUploader = fsr.getFileUploader(
   (file) => {
@@ -24,14 +26,22 @@ const fileUploader = fsr.getFileUploader(
 );
 
 const postUploadSteps = async (templateId) => {
-  fs.readFile(`${templatesPath}/${templateId}.svg`, (err, fileContent) => {
+  fs.readFile(`${templatesPath}/${templateId}.svg`, async (err, fileContent) => {
     if (err) {
       throw err;
     }
 
     const sanitizedContent = sanitizeData(fileContent);
-    cpr.storeParameters(extractKeys(fileContent), templateId);
-
+    const fontFamilies = getFontFamilies(sanitizedContent);
+    const fonts = await Promise.all(fontFamilies.map(async (fontName) => {
+      const fontPath = await fr.getFontPath(fontName);
+      return {
+        name: fontName,
+        path: fontPath
+      };
+    }));
+    
+    cpr.storeParameters(extractKeys(fileContent), templateId, fonts);
     fs.writeFileSync(`${templatesPath}/${templateId}.svg`, sanitizedContent);
   });
 }

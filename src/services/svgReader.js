@@ -5,8 +5,10 @@ const svgr = new SvgReader(keyRegExp);
 
 const replaceKeys = svgr.replaceKeys;
 const extractKeys = svgr.extractKeys;
+const getFontFamilies = svgr.getFontFamilies;
 
 export {
 	replaceKeys,
-	extractKeys
+	extractKeys,
+	getFontFamilies
 }

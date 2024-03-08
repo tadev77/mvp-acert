@@ -1,5 +1,18 @@
 import * as cheerio from 'cheerio';
 
+function extractLastFontFamily(styleString) {
+  const regex = /font-family:\s*([^;]+)(?:;|$)/g;
+
+  let lastFontFamily;
+  let match;
+
+  while ((match = regex.exec(styleString)) !== null) {
+    lastFontFamily = match[1];
+  }
+
+  return lastFontFamily;
+}
+
 function replaceInSentence(textInput, substitutions, keyRegExp, verifiedKeys) {
 	const matches = textInput.matchAll(keyRegExp);
 	let key;
@@ -98,5 +111,17 @@ export default class CheerioSvgReader {
       }
     });
     return keys;
+  }
+
+  getFontFamilies(svg) {
+    const fontFamilies = [];
+    let elementFontFamily
+    loopThroughText(svg, (element, $) => {
+      elementFontFamily = extractLastFontFamily($(element).attr('style'));
+      if (elementFontFamily) {
+        fontFamilies.push(elementFontFamily);
+      }
+    });
+    return fontFamilies;
   }
 }

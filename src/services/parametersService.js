@@ -3,8 +3,8 @@ import APIError from "../utils/APIError.js";
 
 const cpr = new CertificateParametersRepository();
 
-async function storeParameters(parameters, templateId) {
-  return cpr.storeParameters(parameters, templateId);
+async function storeParameters(parameters, templateId, fontFamilies) {
+  return cpr.storeParameters(parameters, templateId, fontFamilies);
 }
 
 async function validateParameters(requestParameters, templateId) {
