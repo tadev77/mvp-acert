@@ -4,13 +4,13 @@ import APIError from "../utils/APIError.js";
 const cpr = new CertificateParametersRepository();
 
 async function storeParameters(parameters, templateId, fontFamilies) {
-  return cpr.storeParameters(parameters, templateId, fontFamilies);
+  return cpr.storeTemplate(parameters, templateId, fontFamilies);
 }
 
 async function validateParameters(requestParameters, templateId) {
 
   try {
-    const storedParameters = await cpr.getParameters(templateId);
+    const { parameters: storedParameters } = await cpr.getTemplate(templateId);
 
     if(storedParameters === undefined) {
       throw APIError(`Nothing stored at the templateId ${templateId}`, 404);

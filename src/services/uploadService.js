@@ -40,7 +40,7 @@ const postUploadSteps = async (templateId) => {
       };
     }));
     
-    cpr.storeParameters(extractKeys(fileContent), templateId, fonts);
+    cpr.storeTemplate(extractKeys(fileContent), templateId, fonts);
     fs.writeFileSync(`${templatesPath}/${templateId}.svg`, sanitizedContent);
   });
 }

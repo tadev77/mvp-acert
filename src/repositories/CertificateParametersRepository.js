@@ -1,7 +1,7 @@
 import CertificateTemplate from "../models/certificateTemplate.js";
 export class CertificateParametersRepository {
 
-  async storeParameters(parameters, templateId, fontFamilies) {
+  async storeTemplate(parameters, templateId, fontFamilies) {
     try {
       const newCertificateTemplate = new CertificateTemplate({
         _id: templateId,
@@ -16,10 +16,10 @@ export class CertificateParametersRepository {
     }
   }
 
-  async getParameters(templateId) {
+  async getTemplate(templateId) {
     try {
       const template = await CertificateTemplate.findById(templateId).exec();
-      return template.parameters;
+      return template;
     } catch (error) {
       throw Error('Error saving certificate template:', error);
     }
