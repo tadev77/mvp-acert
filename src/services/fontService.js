@@ -25,5 +25,12 @@ export default {
     }).catch(err => {
       throw new APIError(`Sorry! We couldn't find the font ${inputFontName} in our system!`, 404, err);
     });
+  },
+
+  async registerFont(fontFile) {
+    if (!fontFile) {
+      return new APIError('No file uploaded', 400);
+    }
+    fr.storeFont(fontFile);
   }
 }
