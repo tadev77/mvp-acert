@@ -7,7 +7,7 @@ import fs from 'fs';
 import APIError from '../utils/APIError.js';
 
 const allowedExtensions = ['.ttf', '.otf'];
-const __dirname = path.resolve();
+const __dirname = path.resolve('/usr/share/');
 const uploadDir = path.join(__dirname, 'fonts');
 
 if (!fs.existsSync(uploadDir)) {

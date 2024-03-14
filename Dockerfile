@@ -1,4 +1,8 @@
-FROM node:21.6-alpine3.18
+FROM node:21-alpine3.18
+
+# Instalação do pacote fontconfig
+RUN apk --no-cache add fontconfig
+
 RUN mkdir -p /tmp/uploads
 RUN mkdir -p /tmp/certificates
 

@@ -30,14 +30,23 @@ const postUploadSteps = async (templateId) => {
       throw err;
     }
 
+    const notFoundFonts = [];
     const sanitizedContent = sanitizeData(fileContent);
     const fontFamilies = getFontFamilies(sanitizedContent);
     const fonts = await Promise.all(fontFamilies.map(async (fontName) => {
-      const fontPath = await fontService.getFontPath(fontName);
-      return {
-        name: fontName,
-        path: fontPath
-      };
+      try {
+        const fontPath = await fontService.getFontPath(fontName);
+        return {
+          name: fontName,
+          path: fontPath
+        };
+      } catch (err) {
+        notFoundFonts.push(fontName);
+        return {
+          name: fontName,
+          path: ''
+        };
+      }
     }));
     
     cpr.storeTemplate(extractKeys(fileContent), templateId, fonts);
