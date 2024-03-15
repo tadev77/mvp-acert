@@ -1,8 +1,10 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import routes from './src/routes.js';
 import { uploadErrorHandler } from './src/services/uploadService.js';
 
+dotenv.config();
 import('./src/config/database.js');
 
 const app = express();

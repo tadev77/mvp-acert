@@ -8,7 +8,8 @@ if (process.env.DOCKER_ENV === '1') {
   mongoHost = 'localhost';
 }
 
-const mongoURI = `mongodb://${mongoHost}:27017/acert`;
+const mongoURI = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${mongoHost}:27017/acert`;
+console.log({mongoURI});
 
 mongoose.connect(mongoURI, {
   // autoReconnect: true,
