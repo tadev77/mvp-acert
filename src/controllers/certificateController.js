@@ -11,7 +11,7 @@ const createCertificate = async (req, res) => {
 	getFile(templateId).then(async (file) => {
 		const { replacedSvg , verifiedKeys } = replaceKeys(file, substitutions);
 		await validateParameters(verifiedKeys, templateId);
-		return generatePDF(replacedSvg, templateId);
+		return generatePDF(replacedSvg, templateId, substitutions);
 	}).then(certificatePath => {
 		return res.status(200).sendFile(certificatePath);
 	}).catch(err => {
